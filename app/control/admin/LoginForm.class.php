@@ -26,7 +26,7 @@ class LoginForm extends TPage
         $this->style = 'clear:both';
         // creates the form
         $this->form = new BootstrapFormBuilder('form_login');
-        $this->form->setFormTitle( 'LOG IN' );
+        $this->form->setFormTitle( 'ACESSAR' );
         
         // create the form fields
         $login = new TEntry('login');
@@ -97,7 +97,7 @@ class LoginForm extends TPage
         }
         
         $btn = $this->form->addAction(_t('Log in'), new TAction(array($this, 'onLogin')), '');
-        $btn->class = 'btn btn-primary';
+        $btn->class = 'btn btn-success';
         $btn->style = 'height: 40px;width: 90%;display: block;margin: auto;font-size:17px;';
         
         $wrapper = new TElement('div');
