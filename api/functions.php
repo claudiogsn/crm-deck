@@ -9,18 +9,22 @@ function validateData($data) {
 function registerClient($data) {
     global $pdo;
     
-    // Verifica se o CPF já existe no banco de dados
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS count FROM cliente WHERE cpf = ?");
-    $stmt->execute([$data['cpf']]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($row['count'] > 0) {
+    // Valida e limpa o CPF
+    $cleaned_cpf = cleanCPF($data['cpf']);
+    if (!validaCPF($cleaned_cpf)) {
         http_response_code(400);
-        return array("error" => "CPF ja cadastrado");
+        return array("error" => "CPF inválido");
+    }
+
+    // Verifica se o CPF já existe no banco de dados
+    if (checkExistingCPF($cleaned_cpf)) {
+        http_response_code(400);
+        return array("error" => "CPF já cadastrado");
     }
     
     // Insira os dados do cliente na tabela cliente
     $stmt = $pdo->prepare("INSERT INTO cliente (nome, email, telefone, cpf, data_nascimento) VALUES (?, ?, ?, ?, ?)");
-    $stmt->execute([$data['nome'], $data['email'], $data['telefone'], $data['cpf'], $data['data_nascimento']]);
+    $stmt->execute([$data['nome'], $data['email'], $data['telefone'], $cleaned_cpf, $data['data_nascimento']]);
     
     // Gera o código do voucher
     $voucherCode = generateVoucherCode();
@@ -37,7 +41,7 @@ function registerClient($data) {
     // Insere o voucher na tabela voucher
     $ip = $_SERVER['REMOTE_ADDR'];
     $stmt = $pdo->prepare("INSERT INTO voucher (cpf_cliente, campanha_id, codigo, data_criacao, ip_criacao) VALUES (?, ?, ?, NOW(), ?)");
-    $stmt->execute([$data['cpf'], $data['campanha_id'], $voucherCode, $ip]);
+    $stmt->execute([$cleaned_cpf, $data['campanha_id'], $voucherCode, $ip]);
     
     return array("voucher_code" => $voucherCode);
 }
@@ -57,28 +61,54 @@ function generateVoucherCode() {
     return $voucherCode;
 }
 
-function validaCPF($cpf) {
-
+function cleanCPF($cpf) {
+    // Remove pontos e traços do CPF
     $cpf = preg_replace('/[^0-9]/', '', $cpf);
-    if (strlen($cpf) != 11) {
+
+    return $cpf;
+}
+
+function validaCPF($cpf) {
+    // Extrai somente os números
+    $cpf = preg_replace('/[^0-9]/', '', (string) $cpf);
+
+    // Verifica se o CPF tem 11 caracteres
+    if (strlen($cpf) !== 11) {
         return false;
     }
 
+    // Verifica se todos os números são iguais, o que torna o CPF inválido
     if (preg_match('/(\d)\1{10}/', $cpf)) {
         return false;
     }
 
-    // Calcular os dígitos verificadores
+    // Calcula o dígito verificador
     for ($i = 9; $i < 11; $i++) {
-        $sum = 0;
-        for ($j = 0; $j < $i; $j++) {
+        for ($j = 0, $sum = 0; $j < $i; $j++) {
             $sum += $cpf[$j] * (($i + 1) - $j);
         }
         $digit = ((10 * $sum) % 11) % 10;
-        if ($cpf[$i] != $digit) {
+        if ($cpf[$j] != $digit) {
             return false;
         }
     }
+
     return true;
 }
+
+function checkExistingCPF($cpf) {
+    global $pdo;
+
+    // Limpa o CPF
+    $cleaned_cpf = cleanCPF($cpf);
+
+    // Verifica se o CPF já existe no banco de dados
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS count FROM cliente WHERE cpf = :cpf");
+    $stmt->execute(['cpf' => $cleaned_cpf]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row['count'] > 0;
+}
+
+?>
+
 

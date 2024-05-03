@@ -1,21 +1,27 @@
 <?php
 
+header('Content-Type: application/json');
 require_once 'functions.php';
 
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
+function handlePOSTRequest() {
     $data = json_decode(file_get_contents("php://input"), true);
 
-    if (validateData($data)) {
-        $response = registerClient($data);
-        header('Content-Type: application/json');
-        echo json_encode($response);
-    } else {
-        http_response_code(400);
-        echo json_encode(array("message" => "Dados inválidos."));
+    if (!validateData($data)) {
+        return response(400, "Dados inválidos.");
     }
-} else {
-    http_response_code(405);
-    echo json_encode(array("message" => "Método não permitido."));
+
+    return registerClient($data);
 }
+
+function response($code, $message) {
+    http_response_code($code);
+    echo json_encode(array("message" => $message));
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $response = handlePOSTRequest();
+    echo json_encode($response);
+} else {
+    response(405, "Método não permitido.");
+}
+?>
