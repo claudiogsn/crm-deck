@@ -1,49 +1,9 @@
 <?php
 
-$config = parse_ini_file('../app/config/communication.ini');
-
-$host = $config['host'];
-$port = $config['port'];
-$dbname = $config['name'];
-$username = $config['user'];
-$password = $config['pass'];
+require_once 'config.php';
+require_once 'functions.php';
 
 
-$dsn = "{$config['type']}:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
-
-try {
-    $pdo = new PDO($dsn, $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    http_response_code(500); 
-    die("Erro ao conectar ao banco de dados: " . $e->getMessage());
-}
-
-
-function validaCPF($cpf) {
-
-    $cpf = preg_replace('/[^0-9]/', '', $cpf);
-    if (strlen($cpf) != 11) {
-        return false;
-    }
-
-    if (preg_match('/(\d)\1{10}/', $cpf)) {
-        return false;
-    }
-
-    // Calcular os dígitos verificadores
-    for ($i = 9; $i < 11; $i++) {
-        $sum = 0;
-        for ($j = 0; $j < $i; $j++) {
-            $sum += $cpf[$j] * (($i + 1) - $j);
-        }
-        $digit = ((10 * $sum) % 11) % 10;
-        if ($cpf[$i] != $digit) {
-            return false;
-        }
-    }
-    return true;
-}
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
