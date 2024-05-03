@@ -26,39 +26,18 @@ class VoucherList extends TPage
         
 
         // create the form fields
-        $voucher_id = new TDBUniqueSearch('voucher_id', 'communication', 'Voucher', 'voucher_id', 'cpf_cliente');
         $cpf_cliente = new TEntry('cpf_cliente');
-        $campanha_id = new TDBUniqueSearch('campanha_id', 'communication', 'Campanha', 'campanha_id', 'nome');
         $codigo = new TEntry('codigo');
-        $data_criacao = new TEntry('data_criacao');
-        $data_uso = new TEntry('data_uso');
-        $usuario_uso_id = new TEntry('usuario_uso_id');
-        $ip_uso = new TEntry('ip_uso');
-        $ip_criacao = new TEntry('ip_criacao');
 
 
         // add the fields
-        $this->form->addFields( [ new TLabel('Voucher Id') ], [ $voucher_id ] );
-        $this->form->addFields( [ new TLabel('Cpf Cliente') ], [ $cpf_cliente ] );
-        $this->form->addFields( [ new TLabel('Campanha Id') ], [ $campanha_id ] );
-        $this->form->addFields( [ new TLabel('Codigo') ], [ $codigo ] );
-        $this->form->addFields( [ new TLabel('Data Criacao') ], [ $data_criacao ] );
-        $this->form->addFields( [ new TLabel('Data Uso') ], [ $data_uso ] );
-        $this->form->addFields( [ new TLabel('Usuario Uso Id') ], [ $usuario_uso_id ] );
-        $this->form->addFields( [ new TLabel('Ip Uso') ], [ $ip_uso ] );
-        $this->form->addFields( [ new TLabel('Ip Criacao') ], [ $ip_criacao ] );
+        $this->form->addFields( [ new TLabel('CPF') ], [ $cpf_cliente ] );
+        $this->form->addFields( [ new TLabel('VOUCHER') ], [ $codigo ] );
 
 
         // set sizes
-        $voucher_id->setSize('100%');
         $cpf_cliente->setSize('100%');
-        $campanha_id->setSize('100%');
         $codigo->setSize('100%');
-        $data_criacao->setSize('100%');
-        $data_uso->setSize('100%');
-        $usuario_uso_id->setSize('100%');
-        $ip_uso->setSize('100%');
-        $ip_criacao->setSize('100%');
 
         
         // keep the form filled during navigation with session data
@@ -77,27 +56,62 @@ class VoucherList extends TPage
         
 
         // creates the datagrid columns
-        $column_voucher_id = new TDataGridColumn('voucher_id', 'Voucher Id', 'right');
-        $column_cpf_cliente = new TDataGridColumn('cpf_cliente', 'Cpf Cliente', 'left');
-        $column_campanha_id = new TDataGridColumn('campanha_id', 'Campanha Id', 'right');
-        $column_codigo = new TDataGridColumn('codigo', 'Codigo', 'left');
-        $column_data_criacao = new TDataGridColumn('data_criacao', 'Data Criacao', 'left');
-        $column_data_uso = new TDataGridColumn('data_uso', 'Data Uso', 'left');
-        $column_usuario_uso_id = new TDataGridColumn('usuario_uso_id', 'Usuario Uso Id', 'right');
-        $column_ip_uso = new TDataGridColumn('ip_uso', 'Ip Uso', 'left');
-        $column_ip_criacao = new TDataGridColumn('ip_criacao', 'Ip Criacao', 'left');
+        $column_voucher_id = new TDataGridColumn('voucher_id', 'ID', 'left');
+        $column_cpf_cliente = new TDataGridColumn('cpf_cliente', 'CPF', 'center');
+        $column_codigo = new TDataGridColumn('codigo', 'VOUCHER', 'center');
+        $column_campanha_id = new TDataGridColumn('campanha_id', 'CAMPANHA', 'center');
+        $column_data_criacao = new TDataGridColumn('data_criacao', 'DATA CRIAÇÃO', 'center');
+        $column_data_uso = new TDataGridColumn('data_uso', 'DATA USO', 'center');
 
 
         // add the columns to the DataGrid
         $this->datagrid->addColumn($column_voucher_id);
         $this->datagrid->addColumn($column_cpf_cliente);
-        $this->datagrid->addColumn($column_campanha_id);
         $this->datagrid->addColumn($column_codigo);
+        $this->datagrid->addColumn($column_campanha_id);
         $this->datagrid->addColumn($column_data_criacao);
         $this->datagrid->addColumn($column_data_uso);
-        $this->datagrid->addColumn($column_usuario_uso_id);
-        $this->datagrid->addColumn($column_ip_uso);
-        $this->datagrid->addColumn($column_ip_criacao);
+
+
+        // creates the datagrid column actions
+        $column_voucher_id->setAction(new TAction([$this, 'onReload']), ['order' => 'voucher_id']);
+        $column_cpf_cliente->setAction(new TAction([$this, 'onReload']), ['order' => 'cpf_cliente']);
+        $column_data_criacao->setAction(new TAction([$this, 'onReload']), ['order' => 'data_criacao']);
+
+        // define the transformer method over image
+        $column_data_criacao->setTransformer( function($value, $object, $row) {
+            if ($value)
+            {
+                try
+                {
+                    $date = new DateTime($value);
+                    return $date->format('d/m/Y');
+                }
+                catch (Exception $e)
+                {
+                    return $value;
+                }
+            }
+            return $value;
+        });
+
+        // define the transformer method over image
+        $column_data_uso->setTransformer( function($value, $object, $row) {
+            if ($value)
+            {
+                try
+                {
+                    $date = new DateTime($value);
+                    return $date->format('d/m/Y');
+                }
+                catch (Exception $e)
+                {
+                    return $value;
+                }
+            }
+            return $value;
+        });
+
 
 
         $action1 = new TDataGridAction(['VoucherForm', 'onEdit'], ['voucher_id'=>'{voucher_id}']);
@@ -165,21 +179,8 @@ class VoucherList extends TPage
         $data = $this->form->getData();
         
         // clear session filters
-        TSession::setValue(__CLASS__.'_filter_voucher_id',   NULL);
         TSession::setValue(__CLASS__.'_filter_cpf_cliente',   NULL);
-        TSession::setValue(__CLASS__.'_filter_campanha_id',   NULL);
         TSession::setValue(__CLASS__.'_filter_codigo',   NULL);
-        TSession::setValue(__CLASS__.'_filter_data_criacao',   NULL);
-        TSession::setValue(__CLASS__.'_filter_data_uso',   NULL);
-        TSession::setValue(__CLASS__.'_filter_usuario_uso_id',   NULL);
-        TSession::setValue(__CLASS__.'_filter_ip_uso',   NULL);
-        TSession::setValue(__CLASS__.'_filter_ip_criacao',   NULL);
-
-        if (isset($data->voucher_id) AND ($data->voucher_id)) {
-            $filter = new TFilter('voucher_id', '=', $data->voucher_id); // create the filter
-            TSession::setValue(__CLASS__.'_filter_voucher_id',   $filter); // stores the filter in the session
-        }
-
 
         if (isset($data->cpf_cliente) AND ($data->cpf_cliente)) {
             $filter = new TFilter('cpf_cliente', 'like', "%{$data->cpf_cliente}%"); // create the filter
@@ -187,45 +188,9 @@ class VoucherList extends TPage
         }
 
 
-        if (isset($data->campanha_id) AND ($data->campanha_id)) {
-            $filter = new TFilter('campanha_id', '=', $data->campanha_id); // create the filter
-            TSession::setValue(__CLASS__.'_filter_campanha_id',   $filter); // stores the filter in the session
-        }
-
-
         if (isset($data->codigo) AND ($data->codigo)) {
             $filter = new TFilter('codigo', 'like', "%{$data->codigo}%"); // create the filter
             TSession::setValue(__CLASS__.'_filter_codigo',   $filter); // stores the filter in the session
-        }
-
-
-        if (isset($data->data_criacao) AND ($data->data_criacao)) {
-            $filter = new TFilter('data_criacao', 'like', "%{$data->data_criacao}%"); // create the filter
-            TSession::setValue(__CLASS__.'_filter_data_criacao',   $filter); // stores the filter in the session
-        }
-
-
-        if (isset($data->data_uso) AND ($data->data_uso)) {
-            $filter = new TFilter('data_uso', 'like', "%{$data->data_uso}%"); // create the filter
-            TSession::setValue(__CLASS__.'_filter_data_uso',   $filter); // stores the filter in the session
-        }
-
-
-        if (isset($data->usuario_uso_id) AND ($data->usuario_uso_id)) {
-            $filter = new TFilter('usuario_uso_id', 'like', "%{$data->usuario_uso_id}%"); // create the filter
-            TSession::setValue(__CLASS__.'_filter_usuario_uso_id',   $filter); // stores the filter in the session
-        }
-
-
-        if (isset($data->ip_uso) AND ($data->ip_uso)) {
-            $filter = new TFilter('ip_uso', 'like', "%{$data->ip_uso}%"); // create the filter
-            TSession::setValue(__CLASS__.'_filter_ip_uso',   $filter); // stores the filter in the session
-        }
-
-
-        if (isset($data->ip_criacao) AND ($data->ip_criacao)) {
-            $filter = new TFilter('ip_criacao', 'like', "%{$data->ip_criacao}%"); // create the filter
-            TSession::setValue(__CLASS__.'_filter_ip_criacao',   $filter); // stores the filter in the session
         }
 
         
@@ -253,7 +218,7 @@ class VoucherList extends TPage
             
             // creates a repository for Voucher
             $repository = new TRepository('Voucher');
-            $limit = 10;
+            $limit = 20;
             // creates a criteria
             $criteria = new TCriteria;
             
@@ -267,48 +232,13 @@ class VoucherList extends TPage
             $criteria->setProperty('limit', $limit);
             
 
-            if (TSession::getValue(__CLASS__.'_filter_voucher_id')) {
-                $criteria->add(TSession::getValue(__CLASS__.'_filter_voucher_id')); // add the session filter
-            }
-
-
             if (TSession::getValue(__CLASS__.'_filter_cpf_cliente')) {
                 $criteria->add(TSession::getValue(__CLASS__.'_filter_cpf_cliente')); // add the session filter
             }
 
 
-            if (TSession::getValue(__CLASS__.'_filter_campanha_id')) {
-                $criteria->add(TSession::getValue(__CLASS__.'_filter_campanha_id')); // add the session filter
-            }
-
-
             if (TSession::getValue(__CLASS__.'_filter_codigo')) {
                 $criteria->add(TSession::getValue(__CLASS__.'_filter_codigo')); // add the session filter
-            }
-
-
-            if (TSession::getValue(__CLASS__.'_filter_data_criacao')) {
-                $criteria->add(TSession::getValue(__CLASS__.'_filter_data_criacao')); // add the session filter
-            }
-
-
-            if (TSession::getValue(__CLASS__.'_filter_data_uso')) {
-                $criteria->add(TSession::getValue(__CLASS__.'_filter_data_uso')); // add the session filter
-            }
-
-
-            if (TSession::getValue(__CLASS__.'_filter_usuario_uso_id')) {
-                $criteria->add(TSession::getValue(__CLASS__.'_filter_usuario_uso_id')); // add the session filter
-            }
-
-
-            if (TSession::getValue(__CLASS__.'_filter_ip_uso')) {
-                $criteria->add(TSession::getValue(__CLASS__.'_filter_ip_uso')); // add the session filter
-            }
-
-
-            if (TSession::getValue(__CLASS__.'_filter_ip_criacao')) {
-                $criteria->add(TSession::getValue(__CLASS__.'_filter_ip_criacao')); // add the session filter
             }
 
             
