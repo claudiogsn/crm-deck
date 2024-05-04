@@ -9,6 +9,9 @@ function validateData($data) {
 function registerClient($data) {
     global $pdo;
     
+    $email = strtolower($data['email']);
+
+    
     // Valida e limpa o CPF
     $cleaned_cpf = cleanCPF($data['cpf']);
     if (!validaCPF($cleaned_cpf)) {
