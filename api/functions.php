@@ -42,6 +42,12 @@ function registerClient($data) {
     $ip = $_SERVER['REMOTE_ADDR'];
     $stmt = $pdo->prepare("INSERT INTO voucher (cpf_cliente, campanha_id, codigo, data_criacao, ip_criacao) VALUES (?, ?, ?, NOW(), ?)");
     $stmt->execute([$cleaned_cpf, $data['campanha_id'], $voucherCode, $ip]);
+
+    $email = $data['email'];
+    $subject = "Confirmação de Registro - Voucher do Deck";
+    $message = "Olá " . $data['nome'] . ",\n\nVocê se registrou com sucesso na promoção Chopp Grátis do Deck !\n\nSeu código do voucher é: " . $voucherCode . "\n\nApresente este código no caixa de uma das seguintes unidades para resgatar o seu Chopp Grátis:\n• DECK TRATTORIA\n• DECK SUSHI\n• DECK CHURRASQUINHO\n\nObrigado!";
+    $headers = "From: Vem Pro Deck! marketing@vemprodeck.com.br\r\n";
+    mail($email, $subject, $message, $headers);
     
     return array("voucher_code" => $voucherCode);
 }
