@@ -62,6 +62,7 @@ class VoucherList extends TPage
         $column_campanha_id = new TDataGridColumn('campanha->nome', 'CAMPANHA', 'center');
         $column_data_criacao = new TDataGridColumn('data_criacao', 'DATA CRIAÇÃO', 'center');
         $column_data_uso = new TDataGridColumn('data_uso', 'DATA USO', 'center');
+        $column_usuario_uso_id = new TDataGridColumn('usuario_uso_id', 'USER RESGATE', 'center');
 
 
         // add the columns to the DataGrid
@@ -71,6 +72,7 @@ class VoucherList extends TPage
         $this->datagrid->addColumn($column_campanha_id);
         $this->datagrid->addColumn($column_data_criacao);
         $this->datagrid->addColumn($column_data_uso);
+        $this->datagrid->addColumn($column_usuario_uso_id);
 
 
         // creates the datagrid column actions
