@@ -22,7 +22,7 @@ class ClienteForm extends TPage
         
 
         // create the form fields
-        $cliente_id = new TDBUniqueSearch('cliente_id', 'communication', 'Cliente', 'cliente_id', 'nome');
+        $cliente_id = new THidden('cliente_id');
         $nome = new TEntry('nome');
         $email = new TEntry('email');
         $telefone = new TEntry('telefone');
@@ -31,28 +31,32 @@ class ClienteForm extends TPage
 
 
         // add the fields
-        $this->form->addFields( [ new TLabel('Cliente Id') ], [ $cliente_id ] );
-        $this->form->addFields( [ new TLabel('Nome') ], [ $nome ] );
-        $this->form->addFields( [ new TLabel('Email') ], [ $email ] );
-        $this->form->addFields( [ new TLabel('Telefone') ], [ $telefone ] );
-        $this->form->addFields( [ new TLabel('Cpf') ], [ $cpf ] );
-        $this->form->addFields( [ new TLabel('Data Nascimento') ], [ $data_nascimento ] );
+        $this->form->addFields( [ new TLabel('Nome :') ], [ $nome ] );
+        $this->form->addFields( [ new TLabel('Email :') ], [ $email ] );
+        $this->form->addFields( [ new TLabel('Telefone :') ], [ $telefone ] );
+        $this->form->addFields( [ new TLabel('CPF :') ], [ $cpf ] );
+        $this->form->addFields( [ new TLabel('Data Nascimento :') ], [ $data_nascimento ] );
 
 
 
         // set sizes
-        $cliente_id->setSize('100%');
-        $nome->setSize('100%');
-        $email->setSize('100%');
-        $telefone->setSize('100%');
-        $cpf->setSize('100%');
-        $data_nascimento->setSize('100%');
+        $cliente_id->setSize('50%');
+        $nome->setSize('50%');
+        $email->setSize('50%');
+        $telefone->setSize('50%');
+        $cpf->setSize('50%');
+        $data_nascimento->setSize('50%');
 
 
 
         if (!empty($cliente_id))
         {
             $cliente_id->setEditable(FALSE);
+        }
+
+        if (!empty($cpf))
+        {
+            $cpf->setEditable(FALSE);
         }
         
         /** samples
@@ -84,11 +88,11 @@ class ClienteForm extends TPage
         {
             TTransaction::open('communication'); // open a transaction
             
-            /**
+            
             // Enable Debug logger for SQL operations inside the transaction
             TTransaction::setLogger(new TLoggerSTD); // standard output
             TTransaction::setLogger(new TLoggerTXT('log.txt')); // file
-            **/
+            
             
             $this->form->validate(); // validate form data
             $data = $this->form->getData(); // get form data as array

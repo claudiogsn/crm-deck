@@ -77,7 +77,7 @@ class Voucher extends TRecord
     {
         // loads the associated object
         if (empty($this->cliente))
-            $this->cliente = new Cliente($this->cliente_id);
+            $this->cliente = new Cliente($this->cpf_cliente);
     
         // returns the associated object
         return $this->cliente;

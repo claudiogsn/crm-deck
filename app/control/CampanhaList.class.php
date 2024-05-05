@@ -1,9 +1,9 @@
 <?php
 /**
- * VoucherList Listing
- * @author  <your name here>
+ * CampanhaList Listing
+ * @author  Claudio Gomes
  */
-class VoucherList extends TPage
+class CampanhaList extends TPage
 {
     private $form; // form
     private $datagrid; // listing
@@ -21,23 +21,20 @@ class VoucherList extends TPage
         parent::__construct();
         
         // creates the form
-        $this->form = new BootstrapFormBuilder('form_search_Voucher');
-        $this->form->setFormTitle('Voucher');
+        $this->form = new BootstrapFormBuilder('form_search_Campanha');
+        $this->form->setFormTitle('Campanha');
         
 
         // create the form fields
-        $cpf_cliente = new TEntry('cpf_cliente');
-        $codigo = new TEntry('codigo');
+        $nome = new TEntry('nome');
 
 
         // add the fields
-        $this->form->addFields( [ new TLabel('CPF :') ], [ $cpf_cliente ] );
-        $this->form->addFields( [ new TLabel('VOUCHER :') ], [ $codigo ] );
+        $this->form->addFields( [ new TLabel('Nome') ], [ $nome ] );
 
 
         // set sizes
-        $cpf_cliente->setSize('40%');
-        $codigo->setSize('40%');
+        $nome->setSize('100%');
 
         
         // keep the form filled during navigation with session data
@@ -46,7 +43,7 @@ class VoucherList extends TPage
         // add the search form actions
         $btn = $this->form->addAction(_t('Find'), new TAction([$this, 'onSearch']), 'fa:search');
         $btn->class = 'btn btn-sm btn-primary';
-        //$this->form->addActionLink(_t('New'), new TAction(['VoucherForm', 'onEdit']), 'fa:plus green');
+        $this->form->addActionLink(_t('New'), new TAction(['CampanhaForm', 'onEdit']), 'fa:plus green');
         
         // creates a Datagrid
         $this->datagrid = new BootstrapDatagridWrapper(new TDataGrid);
@@ -56,80 +53,78 @@ class VoucherList extends TPage
         
 
         // creates the datagrid columns
-        $column_voucher_id = new TDataGridColumn('voucher_id', 'ID', 'left');
-        $column_cpf_cliente = new TDataGridColumn('cpf_cliente', 'CPF', 'center');
-        $column_codigo = new TDataGridColumn('codigo', 'VOUCHER', 'center');
-        $column_campanha_id = new TDataGridColumn('campanha->nome', 'CAMPANHA', 'center');
-        $column_data_criacao = new TDataGridColumn('data_criacao', 'DATA CRIAÇÃO', 'center');
-        $column_data_uso = new TDataGridColumn('data_uso', 'DATA USO', 'center');
+        $column_campanha_id = new TDataGridColumn('campanha_id', 'Campanha Id', 'right');
+        $column_nome = new TDataGridColumn('nome', 'Nome', 'left');
+        $column_descricao = new TDataGridColumn('descricao', 'Descricao', 'left');
+        $column_data_inicio = new TDataGridColumn('data_inicio', 'Data Inicio', 'left');
+        $column_data_fim = new TDataGridColumn('data_fim', 'Data Fim', 'left');
+        $column_ativa = new TDataGridColumn('ativa', 'Ativa', 'right');
 
 
         // add the columns to the DataGrid
-        $this->datagrid->addColumn($column_voucher_id);
-        $this->datagrid->addColumn($column_cpf_cliente);
-        $this->datagrid->addColumn($column_codigo);
         $this->datagrid->addColumn($column_campanha_id);
-        $this->datagrid->addColumn($column_data_criacao);
-        $this->datagrid->addColumn($column_data_uso);
+        $this->datagrid->addColumn($column_nome);
+        $this->datagrid->addColumn($column_descricao);
+        $this->datagrid->addColumn($column_data_inicio);
+        $this->datagrid->addColumn($column_data_fim);
+        $this->datagrid->addColumn($column_ativa);
 
 
         // creates the datagrid column actions
-        $column_voucher_id->setAction(new TAction([$this, 'onReload']), ['order' => 'voucher_id']);
-        $column_cpf_cliente->setAction(new TAction([$this, 'onReload']), ['order' => 'cpf_cliente']);
-        $column_data_criacao->setAction(new TAction([$this, 'onReload']), ['order' => 'data_criacao']);
-
-        // define the transformer method over image
-        $column_campanha_id->setTransformer(function($value, $object, $row) {
-            return $object->campanha->nome; // retorna o nome da campanha
-        });
-        $column_data_criacao->setTransformer( function($value, $object, $row) {
-            if ($value)
-            {
-                try
-                {
-                    $date = new DateTime($value);
-                    return $date->format('d/m/Y H:i:s');
-                }
-                catch (Exception $e)
-                {
-                    return $value;
-                }
-            }
-            return $value;
-        });
-
-        // define the transformer method over image
-        $column_data_uso->setTransformer( function($value, $object, $row) {
-            if ($value)
-            {
-                try
-                {
-                    $date = new DateTime($value);
-                    return $date->format('d/m/Y H:i:s');
-                }
-                catch (Exception $e)
-                {
-                    return $value;
-                }
-            }
-            return $value;
-        });
+        $column_nome->setAction(new TAction([$this, 'onReload']), ['order' => 'nome']);
 
 
-
-        $userGroups = TSession::getValue('usergroupids');
-
+        // inline editing
+        $data_inicio_edit = new TDataGridAction(array($this, 'onInlineEdit'));
+        $data_inicio_edit->setField('campanha_id');
+        $column_data_inicio->setEditAction($data_inicio_edit);
         
-        $action1 = new TDataGridAction(['VoucherForm', 'onEdit'], ['voucher_id'=>'{voucher_id}']);
-        if (in_array(1, $userGroups)) {
-            $action2 = new TDataGridAction([$this, 'onDelete'], ['voucher_id'=>'{voucher_id}']);
-        } 
-       
+        $data_fim_edit = new TDataGridAction(array($this, 'onInlineEdit'));
+        $data_fim_edit->setField('campanha_id');
+        $column_data_fim->setEditAction($data_fim_edit);
+        
+
+        // define the transformer method over image
+        $column_data_inicio->setTransformer( function($value, $object, $row) {
+            if ($value)
+            {
+                try
+                {
+                    $date = new DateTime($value);
+                    return $date->format('d/m/Y');
+                }
+                catch (Exception $e)
+                {
+                    return $value;
+                }
+            }
+            return $value;
+        });
+
+        // define the transformer method over image
+        $column_data_fim->setTransformer( function($value, $object, $row) {
+            if ($value)
+            {
+                try
+                {
+                    $date = new DateTime($value);
+                    return $date->format('d/m/Y');
+                }
+                catch (Exception $e)
+                {
+                    return $value;
+                }
+            }
+            return $value;
+        });
+
+
+
+        $action1 = new TDataGridAction(['CampanhaForm', 'onEdit'], ['campanha_id'=>'{campanha_id}']);
+        $action2 = new TDataGridAction([$this, 'onDelete'], ['campanha_id'=>'{campanha_id}']);
         
         $this->datagrid->addAction($action1, _t('Edit'),   'far:edit blue');
-        if (in_array(1, $userGroups)) {
-            $this->datagrid->addAction($action2, _t('Delete'), 'far:trash-alt red');
-        }
+        $this->datagrid->addAction($action2 ,_t('Delete'), 'far:trash-alt red');
         
         // create the datagrid model
         $this->datagrid->createModel();
@@ -142,7 +137,7 @@ class VoucherList extends TPage
         // vertical box container
         $container = new TVBox;
         $container->style = 'width: 100%';
-        $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
+        // $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
         $container->add($this->form);
         $container->add(TPanelGroup::pack('', $this->datagrid, $this->pageNavigation));
         
@@ -166,7 +161,7 @@ class VoucherList extends TPage
             $value = $param['value'];
             
             TTransaction::open('communication'); // open a transaction with database
-            $object = new Voucher($key); // instantiates the Active Record
+            $object = new Campanha($key); // instantiates the Active Record
             $object->{$field} = $value;
             $object->store(); // update the object in the database
             TTransaction::close(); // close the transaction
@@ -190,18 +185,11 @@ class VoucherList extends TPage
         $data = $this->form->getData();
         
         // clear session filters
-        TSession::setValue(__CLASS__.'_filter_cpf_cliente',   NULL);
-        TSession::setValue(__CLASS__.'_filter_codigo',   NULL);
+        TSession::setValue(__CLASS__.'_filter_nome',   NULL);
 
-        if (isset($data->cpf_cliente) AND ($data->cpf_cliente)) {
-            $filter = new TFilter('cpf_cliente', 'like', "%{$data->cpf_cliente}%"); // create the filter
-            TSession::setValue(__CLASS__.'_filter_cpf_cliente',   $filter); // stores the filter in the session
-        }
-
-
-        if (isset($data->codigo) AND ($data->codigo)) {
-            $filter = new TFilter('codigo', 'like', "%{$data->codigo}%"); // create the filter
-            TSession::setValue(__CLASS__.'_filter_codigo',   $filter); // stores the filter in the session
+        if (isset($data->nome) AND ($data->nome)) {
+            $filter = new TFilter('nome', 'like', "%{$data->nome}%"); // create the filter
+            TSession::setValue(__CLASS__.'_filter_nome',   $filter); // stores the filter in the session
         }
 
         
@@ -227,29 +215,24 @@ class VoucherList extends TPage
             // open a transaction with database 'communication'
             TTransaction::open('communication');
             
-            // creates a repository for Voucher
-            $repository = new TRepository('Voucher');
-            $limit = 20;
+            // creates a repository for Campanha
+            $repository = new TRepository('Campanha');
+            $limit = 10;
             // creates a criteria
             $criteria = new TCriteria;
             
             // default order
             if (empty($param['order']))
             {
-                $param['order'] = 'voucher_id';
+                $param['order'] = 'campanha_id';
                 $param['direction'] = 'asc';
             }
             $criteria->setProperties($param); // order, offset
             $criteria->setProperty('limit', $limit);
             
 
-            if (TSession::getValue(__CLASS__.'_filter_cpf_cliente')) {
-                $criteria->add(TSession::getValue(__CLASS__.'_filter_cpf_cliente')); // add the session filter
-            }
-
-
-            if (TSession::getValue(__CLASS__.'_filter_codigo')) {
-                $criteria->add(TSession::getValue(__CLASS__.'_filter_codigo')); // add the session filter
+            if (TSession::getValue(__CLASS__.'_filter_nome')) {
+                $criteria->add(TSession::getValue(__CLASS__.'_filter_nome')); // add the session filter
             }
 
             
@@ -313,7 +296,7 @@ class VoucherList extends TPage
         {
             $key=$param['key']; // get the parameter $key
             TTransaction::open('communication'); // open a transaction with database
-            $object = new Voucher($key, FALSE); // instantiates the Active Record
+            $object = new Campanha($key, FALSE); // instantiates the Active Record
             $object->delete(); // deletes the object from the database
             TTransaction::close(); // close the transaction
             

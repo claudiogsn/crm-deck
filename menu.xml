@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <menu>
-  <menuitem label="Validar Voucher">
-    <action>VoucherList</action>
+  <menuitem label="Resgatar Voucher">
+    <action>ResgateVoucher</action>
     <icon>fas:check-double fa-fw</icon>
   </menuitem>
   <menuitem label="CRM">
     <icon>fas:users-cog fa-fw</icon>
     <menu>
       <menuitem label="Campanhas">
-        <action>CampanhaForm</action>
+        <action>CampanhaList</action>
+        <icon>fas:bullhorn fa-fw</icon>
       </menuitem>
       <menuitem label="Clientes">
         <action>ClienteList</action>

@@ -18,11 +18,11 @@ class CampanhaForm extends TPage
         
         // creates the form
         $this->form = new BootstrapFormBuilder('form_Campanha');
-        $this->form->setFormTitle('Campanha');
+        $this->form->setFormTitle('Cadastro de Campanha');
         
 
         // create the form fields
-        $campanha_id = new TDBUniqueSearch('campanha_id', 'communication', 'Campanha', 'campanha_id', 'nome');
+        $campanha_id = new THidden('campanha_id');
         $nome = new TEntry('nome');
         $descricao = new TText('descricao');
         $data_inicio = new TDate('data_inicio');
@@ -31,22 +31,22 @@ class CampanhaForm extends TPage
 
 
         // add the fields
-        $this->form->addFields( [ new TLabel('Campanha Id') ], [ $campanha_id ] );
-        $this->form->addFields( [ new TLabel('Nome') ], [ $nome ] );
-        $this->form->addFields( [ new TLabel('Descricao') ], [ $descricao ] );
-        $this->form->addFields( [ new TLabel('Data Inicio') ], [ $data_inicio ] );
-        $this->form->addFields( [ new TLabel('Data Fim') ], [ $data_fim ] );
-        $this->form->addFields( [ new TLabel('Ativa') ], [ $ativa ] );
+        //$this->form->addFields( [ new TLabel('Campanha Id') ], [ $campanha_id ] );
+        $this->form->addFields( [ new TLabel('NOME : ') ], [ $nome ] );
+        $this->form->addFields( [ new TLabel('DESCRIÇÃO :') ], [ $descricao ] );
+        $this->form->addFields( [ new TLabel('DATA INICIO :') ], [ $data_inicio ] );
+        $this->form->addFields( [ new TLabel('DATA FIM :') ], [ $data_fim ] );
+        $this->form->addFields( [ new TLabel('ATIVA :') ], [ $ativa ] );
 
 
 
         // set sizes
-        $campanha_id->setSize('100%');
-        $nome->setSize('100%');
-        $descricao->setSize('100%');
-        $data_inicio->setSize('100%');
-        $data_fim->setSize('100%');
-        $ativa->setSize('100%');
+        //$campanha_id->setSize('100%');
+        $nome->setSize('50%');
+        $descricao->setSize('50%');
+        $data_inicio->setSize('50%');
+        $data_fim->setSize('50%');
+        $ativa->setSize('50%');
 
 
 
@@ -84,11 +84,11 @@ class CampanhaForm extends TPage
         {
             TTransaction::open('communication'); // open a transaction
             
-            /**
+            
             // Enable Debug logger for SQL operations inside the transaction
             TTransaction::setLogger(new TLoggerSTD); // standard output
             TTransaction::setLogger(new TLoggerTXT('log.txt')); // file
-            **/
+            
             
             $this->form->validate(); // validate form data
             $data = $this->form->getData(); // get form data as array

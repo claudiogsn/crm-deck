@@ -29,18 +29,17 @@ class VoucherForm extends TPage
 
 
         // add the fields
-        $this->form->addFields( [ new TLabel('Voucher Id') ], [ $voucher_id ] );
-        $this->form->addFields( [ new TLabel('Cpf Cliente') ], [ $cpf_cliente ] );
-        $this->form->addFields( [ new TLabel('Campanha Id') ], [ $campanha_id ] );
-        $this->form->addFields( [ new TLabel('Codigo') ], [ $codigo ] );
+        $this->form->addFields( [ new TLabel('CLIENTE :') ], [ $cpf_cliente ] );
+        $this->form->addFields( [ new TLabel('CAMPANHA :') ], [ $campanha_id ] );
+        $this->form->addFields( [ new TLabel('VOUCHER: ') ], [ $codigo ] );
 
 
 
         // set sizes
-        $voucher_id->setSize('100%');
-        $cpf_cliente->setSize('100%');
-        $campanha_id->setSize('100%');
-        $codigo->setSize('100%');
+        $voucher_id->setSize('40%');
+        $cpf_cliente->setSize('40%');
+        $campanha_id->setSize('40%');
+        $codigo->setSize('40%');
 
 
 
@@ -48,6 +47,17 @@ class VoucherForm extends TPage
         {
             $voucher_id->setEditable(FALSE);
         }
+
+        if (!empty($cpf_cliente))
+        {
+            $cpf_cliente->setEditable(FALSE);
+        }
+
+        if (!empty($campanha_id))
+        {
+            $campanha_id->setEditable(FALSE);
+        }
+        
         
         /** samples
          $fieldX->addValidation( 'Field X', new TRequiredValidator ); // add validation
@@ -57,7 +67,7 @@ class VoucherForm extends TPage
         // create the form actions
         $btn = $this->form->addAction(_t('Save'), new TAction([$this, 'onSave']), 'fa:save');
         $btn->class = 'btn btn-sm btn-primary';
-        $this->form->addActionLink(_t('New'),  new TAction([$this, 'onEdit']), 'fa:eraser red');
+        //$this->form->addActionLink(_t('New'),  new TAction([$this, 'onEdit']), 'fa:eraser red');
         
         // vertical box container
         $container = new TVBox;
@@ -78,11 +88,10 @@ class VoucherForm extends TPage
         {
             TTransaction::open('communication'); // open a transaction
             
-            /**
             // Enable Debug logger for SQL operations inside the transaction
             TTransaction::setLogger(new TLoggerSTD); // standard output
             TTransaction::setLogger(new TLoggerTXT('log.txt')); // file
-            **/
+            
             
             $this->form->validate(); // validate form data
             $data = $this->form->getData(); // get form data as array

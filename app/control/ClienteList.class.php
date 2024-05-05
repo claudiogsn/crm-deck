@@ -61,12 +61,30 @@ class ClienteList extends TPage
         
 
         // creates the datagrid columns
-        $column_cliente_id = new TDataGridColumn('cliente_id', 'Cliente Id', 'right');
-        $column_nome = new TDataGridColumn('nome', 'Nome', 'left');
-        $column_email = new TDataGridColumn('email', 'Email', 'left');
-        $column_telefone = new TDataGridColumn('telefone', 'Telefone', 'left');
-        $column_cpf = new TDataGridColumn('cpf', 'Cpf', 'left');
-        $column_data_nascimento = new TDataGridColumn('data_nascimento', 'Data Nascimento', 'left');
+        $column_cliente_id = new TDataGridColumn('cliente_id', 'ID', 'center');
+        $column_nome = new TDataGridColumn('nome', 'NOME', 'center');
+        $column_email = new TDataGridColumn('email', 'EMAIL', 'center');
+        $column_telefone = new TDataGridColumn('telefone', 'TELEFONE', 'center');
+        $column_cpf = new TDataGridColumn('cpf', 'CPF', 'center');
+        $column_data_nascimento = new TDataGridColumn('data_nascimento', 'DATA NASCIMENTO', 'center');
+
+
+        $column_data_nascimento->setTransformer( function($value, $object, $row) {
+            if ($value)
+            {
+                try
+                {
+                    $date = new DateTime($value);
+                    return $date->format('d/m/Y');
+                }
+                catch (Exception $e)
+                {
+                    return $value;
+                }
+            }
+            return $value;
+        });
+
 
 
         // add the columns to the DataGrid
@@ -77,12 +95,19 @@ class ClienteList extends TPage
         $this->datagrid->addColumn($column_cpf);
         $this->datagrid->addColumn($column_data_nascimento);
 
+        $userGroups = TSession::getValue('usergroupids');
+
         
         $action1 = new TDataGridAction(['ClienteForm', 'onEdit'], ['cliente_id'=>'{cliente_id}']);
-        $action2 = new TDataGridAction([$this, 'onDelete'], ['cliente_id'=>'{cliente_id}']);
+        if (in_array(1, $userGroups)) {
+            $action2 = new TDataGridAction([$this, 'onDelete'], ['cliente_id'=>'{cliente_id}']);
+        } 
+       
         
         $this->datagrid->addAction($action1, _t('Edit'),   'far:edit blue');
-        $this->datagrid->addAction($action2 ,_t('Delete'), 'far:trash-alt red');
+        if (in_array(1, $userGroups)) {
+            $this->datagrid->addAction($action2, _t('Delete'), 'far:trash-alt red');
+        }
         
         // create the datagrid model
         $this->datagrid->createModel();
@@ -106,7 +131,7 @@ class ClienteList extends TPage
         // vertical box container
         $container = new TVBox;
         $container->style = 'width: 100%';
-        // $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
+        $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
         $container->add($this->form);
         $container->add($panel);
         
