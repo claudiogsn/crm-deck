@@ -12,7 +12,7 @@ class ResgateVoucher extends TPage
         if($_SERVER['SERVER_NAME'] == "localhost"){
             $link = "http://".$_SERVER['SERVER_NAME']."/crm-deck/external/resgate.php?username={$username}";
         }else{
-            $link = "https://crm".$_SERVER['SERVER_NAME']."/external/resgate.php?username={$username}";
+            $link = "https://".$_SERVER['SERVER_NAME']."/external/resgate.php?username={$username}";
         }
 
         $iframe = new TElement('iframe');
