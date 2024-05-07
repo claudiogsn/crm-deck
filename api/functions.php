@@ -48,7 +48,7 @@ function registerClient($data) {
 
     $email = $data['email'];
     $subject = "Confirmação de Registro - Voucher do Deck";
-    $message = "Olá " . $data['nome'] . ",\n\nVocê se registrou com sucesso na promoção Chopp Grátis do Deck !\n\nSeu código do voucher é: " . $voucherCode . "\n\nApresente este código no caixa de uma das seguintes unidades para resgatar o seu Chopp Grátis:\n• DECK TRATTORIA\n• DECK SUSHI\n• DECK CHURRASQUINHO\n\nObrigado!";
+    $message = "Olá " . $data['nome'] . ",\n\nVocê se registrou com sucesso na promoção Chopp Grátis do Deck !\n\nSeu código do voucher é: " . $voucherCode . "\n\nApresente este código no caixa de uma das seguintes unidades para resgatar o seu Chopp Grátis:\n• DECK TRATTORIA\n• DECK SUSHI\n• DECK ABC\n\nObrigado!";
     $headers = "From: Vem Pro Deck! marketing@vemprodeck.com.br\r\n";
     mail($email, $subject, $message, $headers);
     
